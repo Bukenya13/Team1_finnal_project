@@ -1,6 +1,44 @@
 const mongodb = require("../data/database");
 const ObjectId = require("mongodb").ObjectId;
 
+const createError = (status, message) => {
+  const err = new Error(message);
+  err.status = status;
+  return err;
+};
+
+const requiredString = (value, field) => {
+  if (typeof value !== "string" || !value.trim()) {
+    throw createError(400, `${field} is required.`);
+  }
+
+  return value.trim();
+};
+
+const stringArray = (value, field) => {
+  if (!Array.isArray(value) || value.some((item) => typeof item !== "string")) {
+    throw createError(400, `${field} must be an array of strings.`);
+  }
+
+  return value.map((item) => item.trim());
+};
+
+const validateAuthorData = (data) => {
+  if (!data || typeof data !== "object") {
+    throw createError(400, "Author data is required.");
+  }
+
+  return {
+    firstName: requiredString(data.firstName, "Author firstName"),
+    lastName: requiredString(data.lastName, "Author lastName"),
+    birthDate: requiredString(data.birthDate, "Author birthDate"),
+    nationality: requiredString(data.nationality, "Author nationality"),
+    biography: requiredString(data.biography, "Author biography"),
+    books: stringArray(data.books, "Author books"),
+    awards: stringArray(data.awards, "Author awards"),
+  };
+};
+
 const getAll = async (req, res, next) => {
   try {
     const result = await mongodb.getDatabase().collection("authors").find();
@@ -17,6 +55,10 @@ const getAll = async (req, res, next) => {
 
 const getSingle = async (req, res, next) => {
   try {
+    if (!ObjectId.isValid(req.params.id)) {
+      throw createError(400, "Invalid author ID.");
+    }
+
     const authorId = new ObjectId(req.params.id);
     const result = await mongodb
       .getDatabase()
@@ -35,7 +77,70 @@ const getSingle = async (req, res, next) => {
     res.status(200).json(authors[0]);
   } catch (err) {
     console.error("Error fetching author:", err.message);
-    err.status = 500;
+    next(err);
+  }
+};
+
+const createAuthor = async (req, res, next) => {
+  try {
+    const author = validateAuthorData(req.body);
+    const result = await mongodb.getDatabase().collection("authors").insertOne(author);
+
+    res.status(201).json({
+      _id: result.insertedId,
+      ...author,
+    });
+  } catch (err) {
+    console.error("Error creating author:", err.message);
+    next(err);
+  }
+};
+
+const updateAuthor = async (req, res, next) => {
+  try {
+    if (!ObjectId.isValid(req.params.id)) {
+      throw createError(400, "Invalid author ID.");
+    }
+
+    const author = validateAuthorData(req.body);
+    const result = await mongodb
+      .getDatabase()
+      .collection("authors")
+      .findOneAndUpdate(
+        { _id: new ObjectId(req.params.id) },
+        { $set: author },
+        { returnDocument: "after" }
+      );
+
+    if (!result) {
+      return res.status(404).json({ message: "Error updating author: Not found" });
+    }
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Error updating author:", err.message);
+    next(err);
+  }
+};
+
+const deleteAuthor = async (req, res, next) => {
+  try {
+    if (!ObjectId.isValid(req.params.id)) {
+      throw createError(400, "Invalid author ID.");
+    }
+
+    const result = await mongodb
+      .getDatabase()
+      .collection("authors")
+      .findOneAndDelete({ _id: new ObjectId(req.params.id) });
+
+    if (!result) {
+      return res.status(404).json({ message: "Error deleting author: Not found" });
+    }
+
+    res.status(200).json({ message: "Author deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting author:", err.message);
     next(err);
   }
 };
@@ -43,4 +148,7 @@ const getSingle = async (req, res, next) => {
 module.exports = {
   getAll,
   getSingle,
+  createAuthor,
+  updateAuthor,
+  deleteAuthor,
 };

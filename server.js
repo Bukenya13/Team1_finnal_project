@@ -25,6 +25,14 @@ app.use((req, res, next) => {
 // send requests to the router
 app.use("/", require("./routes"));
 
+app.use((err, req, res, next) => {
+  const status = err.status || 500;
+  const message = err.message || "Internal Server Error";
+
+  console.error("Request error:", message);
+  res.status(status).json({ message });
+});
+
 mongodb.initDb((err) => {
   if (err) {
     console.error("Database connection failed:", err);
