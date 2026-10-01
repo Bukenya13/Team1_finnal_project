@@ -11,10 +11,40 @@ router.get("/", authorsControllers.getAll);
 router.get("/:id", authorsControllers.getSingle);
 
 // CREATE
-router.post("/", authorsControllers.createAuthor);
+router.post("/", (req, res, next) => {
+	/* #swagger.parameters['body'] = {
+		in: 'body',
+		required: true,
+		schema: {
+			firstName: "Gabriel",
+			lastName: "Garcia Marquez",
+			birthDate: "1927-03-06",
+			nationality: "Colombian",
+			biography: "Example biography",
+			books: ["B004"],
+			awards: ["Nobel Prize in Literature"]
+		}
+	} */
+	authorsControllers.createAuthor(req, res, next);
+});
 
 // UPDATE
-router.put("/:id", authorsControllers.updateAuthor);
+router.put("/:id", (req, res, next) => {
+	/* #swagger.parameters['body'] = {
+		in: 'body',
+		required: true,
+		schema: {
+			firstName: "Gabriel",
+			lastName: "Garcia Marquez",
+			birthDate: "1927-03-06",
+			nationality: "Colombian",
+			biography: "Example biography",
+			books: ["B004"],
+			awards: ["Nobel Prize in Literature"]
+		}
+	} */
+	authorsControllers.updateAuthor(req, res, next);
+});
 
 // DELETE
 router.delete("/:id", authorsControllers.deleteAuthor);

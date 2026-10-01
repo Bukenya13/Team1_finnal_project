@@ -11,10 +11,40 @@ router.get("/", booksControllers.getAll);
 router.get("/:id", booksControllers.getSingle);
 
 // CREATE
-router.post("/", booksControllers.createBook);
+router.post("/", (req, res, next) => {
+	/* #swagger.parameters['body'] = {
+		in: 'body',
+		required: true,
+		schema: {
+			title: "Example title",
+			isbn: "978-0-00-000000-0",
+			authorId: "A004",
+			categoryId: "C001",
+			publishedYear: 2025,
+			pages: 100,
+			summary: "Example summary"
+		}
+	} */
+	booksControllers.createBook(req, res, next);
+});
 
 // UPDATE
-router.put("/:id", booksControllers.updateBook);
+router.put("/:id", (req, res, next) => {
+	/* #swagger.parameters['body'] = {
+		in: 'body',
+		required: true,
+		schema: {
+			title: "Example title",
+			isbn: "978-0-00-000000-0",
+			authorId: "A004",
+			categoryId: "C001",
+			publishedYear: 2025,
+			pages: 100,
+			summary: "Example summary"
+		}
+	} */
+	booksControllers.updateBook(req, res, next);
+});
 
 // DELETE
 router.delete("/:id", booksControllers.deleteBook);

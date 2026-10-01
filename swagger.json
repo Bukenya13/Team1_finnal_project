@@ -1,19 +1,9 @@
 {
-  "0": {
-    "info": {
-      "title": "Library Managment API - CSE 341 - Team 01",
-      "description": "Library Managment API - CSE 341 - Team 01"
-    },
-    "host": "localhost:5000",
-    "schemes": [
-      "http"
-    ]
-  },
   "swagger": "2.0",
   "info": {
-    "version": "1.0.0",
     "title": "Library Managment API - CSE 341 - Team 01",
-    "description": "Library Managment API - CSE 341 - Team 01"
+    "description": "Library Managment API - CSE 341 - Team 01",
+    "version": "1.0.0"
   },
   "host": "localhost:5000",
   "basePath": "/",
@@ -54,6 +44,46 @@
           "Books"
         ],
         "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "example": "Example title"
+                },
+                "isbn": {
+                  "type": "string",
+                  "example": "978-0-00-000000-0"
+                },
+                "authorId": {
+                  "type": "string",
+                  "example": "A004"
+                },
+                "categoryId": {
+                  "type": "string",
+                  "example": "C001"
+                },
+                "publishedYear": {
+                  "type": "number",
+                  "example": 2025
+                },
+                "pages": {
+                  "type": "number",
+                  "example": 100
+                },
+                "summary": {
+                  "type": "string",
+                  "example": "Example summary"
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Created"
@@ -98,6 +128,44 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "example": "Example title"
+                },
+                "isbn": {
+                  "type": "string",
+                  "example": "978-0-00-000000-0"
+                },
+                "authorId": {
+                  "type": "string",
+                  "example": "A004"
+                },
+                "categoryId": {
+                  "type": "string",
+                  "example": "C001"
+                },
+                "publishedYear": {
+                  "type": "number",
+                  "example": 2025
+                },
+                "pages": {
+                  "type": "number",
+                  "example": 100
+                },
+                "summary": {
+                  "type": "string",
+                  "example": "Example summary"
+                }
+              }
+            }
           }
         ],
         "responses": {
@@ -152,6 +220,56 @@
           "Authors"
         ],
         "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "type": "string",
+                  "example": "Gabriel"
+                },
+                "lastName": {
+                  "type": "string",
+                  "example": "Garcia Marquez"
+                },
+                "birthDate": {
+                  "type": "string",
+                  "example": "1927-03-06"
+                },
+                "nationality": {
+                  "type": "string",
+                  "example": "Colombian"
+                },
+                "biography": {
+                  "type": "string",
+                  "example": "Example biography"
+                },
+                "books": {
+                  "type": "array",
+                  "example": [
+                    "B004"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "awards": {
+                  "type": "array",
+                  "example": [
+                    "Nobel Prize in Literature"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": "Created"
@@ -196,6 +314,54 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "firstName": {
+                  "type": "string",
+                  "example": "Gabriel"
+                },
+                "lastName": {
+                  "type": "string",
+                  "example": "Garcia Marquez"
+                },
+                "birthDate": {
+                  "type": "string",
+                  "example": "1927-03-06"
+                },
+                "nationality": {
+                  "type": "string",
+                  "example": "Colombian"
+                },
+                "biography": {
+                  "type": "string",
+                  "example": "Example biography"
+                },
+                "books": {
+                  "type": "array",
+                  "example": [
+                    "B004"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "awards": {
+                  "type": "array",
+                  "example": [
+                    "Nobel Prize in Literature"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
           }
         ],
         "responses": {
