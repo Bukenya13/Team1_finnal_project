@@ -1,7 +1,10 @@
 // add express and set the router
 const router = require("express").Router();
 
+router.use("/", require("./swagger"));
+
 router.get("/", (req, res) => {
+  //#swagger.tags=["Health Check"]
   res.send("Library Management API is running");
 });
 

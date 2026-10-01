@@ -40,6 +40,7 @@ const validateBookData = (data) => {
 };
 
 const getAll = async (req, res, next) => {
+  //#swagger.tags=["Books"]
   try {
     const result = await mongodb.getDatabase().collection("books").find();
     const books = await result.toArray();
@@ -54,6 +55,7 @@ const getAll = async (req, res, next) => {
 };
 
 const getSingle = async (req, res, next) => {
+  //#swagger.tags=["Books"]
   try {
     if (!ObjectId.isValid(req.params.id)) {
       throw createError(400, "Invalid book ID.");
@@ -82,9 +84,13 @@ const getSingle = async (req, res, next) => {
 };
 
 const createBook = async (req, res, next) => {
+  //#swagger.tags=["Books"]
   try {
     const book = validateBookData(req.body);
-    const result = await mongodb.getDatabase().collection("books").insertOne(book);
+    const result = await mongodb
+      .getDatabase()
+      .collection("books")
+      .insertOne(book);
 
     res.status(201).json({
       _id: result.insertedId,
@@ -97,6 +103,7 @@ const createBook = async (req, res, next) => {
 };
 
 const updateBook = async (req, res, next) => {
+  //#swagger.tags=["Books"]
   try {
     if (!ObjectId.isValid(req.params.id)) {
       throw createError(400, "Invalid book ID.");
@@ -109,11 +116,13 @@ const updateBook = async (req, res, next) => {
       .findOneAndUpdate(
         { _id: new ObjectId(req.params.id) },
         { $set: book },
-        { returnDocument: "after" }
+        { returnDocument: "after" },
       );
 
     if (!result) {
-      return res.status(404).json({ message: "Error updating book: Not found" });
+      return res
+        .status(404)
+        .json({ message: "Error updating book: Not found" });
     }
 
     res.status(200).json(result);
@@ -124,6 +133,7 @@ const updateBook = async (req, res, next) => {
 };
 
 const deleteBook = async (req, res, next) => {
+  //#swagger.tags=["Books"]
   try {
     if (!ObjectId.isValid(req.params.id)) {
       throw createError(400, "Invalid book ID.");
@@ -135,7 +145,9 @@ const deleteBook = async (req, res, next) => {
       .findOneAndDelete({ _id: new ObjectId(req.params.id) });
 
     if (!result) {
-      return res.status(404).json({ message: "Error deleting book: Not found" });
+      return res
+        .status(404)
+        .json({ message: "Error deleting book: Not found" });
     }
 
     res.status(200).json({ message: "Book deleted successfully" });

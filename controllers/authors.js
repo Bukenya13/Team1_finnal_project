@@ -40,6 +40,7 @@ const validateAuthorData = (data) => {
 };
 
 const getAll = async (req, res, next) => {
+  //#swagger.tags=["Authors"]
   try {
     const result = await mongodb.getDatabase().collection("authors").find();
     const authors = await result.toArray();
@@ -54,6 +55,7 @@ const getAll = async (req, res, next) => {
 };
 
 const getSingle = async (req, res, next) => {
+  //#swagger.tags=["Authors"]
   try {
     if (!ObjectId.isValid(req.params.id)) {
       throw createError(400, "Invalid author ID.");
@@ -82,9 +84,13 @@ const getSingle = async (req, res, next) => {
 };
 
 const createAuthor = async (req, res, next) => {
+  //#swagger.tags=["Authors"]
   try {
     const author = validateAuthorData(req.body);
-    const result = await mongodb.getDatabase().collection("authors").insertOne(author);
+    const result = await mongodb
+      .getDatabase()
+      .collection("authors")
+      .insertOne(author);
 
     res.status(201).json({
       _id: result.insertedId,
@@ -97,6 +103,7 @@ const createAuthor = async (req, res, next) => {
 };
 
 const updateAuthor = async (req, res, next) => {
+  //#swagger.tags=["Authors"]
   try {
     if (!ObjectId.isValid(req.params.id)) {
       throw createError(400, "Invalid author ID.");
@@ -109,11 +116,13 @@ const updateAuthor = async (req, res, next) => {
       .findOneAndUpdate(
         { _id: new ObjectId(req.params.id) },
         { $set: author },
-        { returnDocument: "after" }
+        { returnDocument: "after" },
       );
 
     if (!result) {
-      return res.status(404).json({ message: "Error updating author: Not found" });
+      return res
+        .status(404)
+        .json({ message: "Error updating author: Not found" });
     }
 
     res.status(200).json(result);
@@ -124,6 +133,7 @@ const updateAuthor = async (req, res, next) => {
 };
 
 const deleteAuthor = async (req, res, next) => {
+  //#swagger.tags=["Authors"]
   try {
     if (!ObjectId.isValid(req.params.id)) {
       throw createError(400, "Invalid author ID.");
@@ -135,7 +145,9 @@ const deleteAuthor = async (req, res, next) => {
       .findOneAndDelete({ _id: new ObjectId(req.params.id) });
 
     if (!result) {
-      return res.status(404).json({ message: "Error deleting author: Not found" });
+      return res
+        .status(404)
+        .json({ message: "Error deleting author: Not found" });
     }
 
     res.status(200).json({ message: "Author deleted successfully" });
