@@ -1,0 +1,106 @@
+@baseUrl = http://localhost:5000
+
+### Health check
+GET {{baseUrl}}/
+
+### List authors
+GET {{baseUrl}}/authors
+
+### Create Gabriel Garcia Marquez
+# @name createAuthor
+POST {{baseUrl}}/authors
+Content-Type: application/json
+
+{
+  "firstName": "Gabriel",
+  "lastName": "Garcia Marquez",
+  "birthDate": "1927-03-06",
+  "nationality": "Colombian",
+  "biography": "Colombian novelist and journalist, widely known for One Hundred Years of Solitude.",
+  "books": ["B004"],
+  "awards": ["Nobel Prize in Literature 1982"]
+}
+
+### Get the created author
+GET {{baseUrl}}/authors/{{createAuthor.response.body.$._id}}
+--------------------------------------------------------------------------------
+### List books
+GET {{baseUrl}}/books
+
+### Create One Hundred Years of Solitude
+# @name createBook
+POST {{baseUrl}}/books
+Content-Type: application/json
+
+{
+  "title": "One Hundred Years of Solitude",
+  "isbn": "978-0-06-088328-7",
+  "authorId": "A004",
+  "categoryId": "C001",
+  "publishedYear": 1967,
+  "pages": 417,
+  "summary": "The multi-generational story of the Buendia family in the fictional town of Macondo."
+}
+
+### Get the created book
+GET {{baseUrl}}/books/{{createBook.response.body.$._id}}
+
+### Update the created author
+PUT {{baseUrl}}/authors/{{createAuthor.response.body.$._id}}
+Content-Type: application/json
+
+{
+  "firstName": "Gabriel",
+  "lastName": "Garcia Marquez",
+  "birthDate": "1927-03-06",
+  "nationality": "Colombian",
+  "biography": "Updated biography for Gabriel Garcia Marquez.",
+  "books": ["B004"],
+  "awards": ["Nobel Prize in Literature 1982"]
+}
+
+### Update the created book
+PUT {{baseUrl}}/books/{{createBook.response.body.$._id}}
+Content-Type: application/json
+
+{
+  "title": "One Hundred Years of Solitude",
+  "isbn": "978-0-06-088328-7",
+  "authorId": "A004",
+  "categoryId": "C001",
+  "publishedYear": 1967,
+  "pages": 417,
+  "summary": "Updated summary for One Hundred Years of Solitude."
+}
+
+### Delete the created book
+DELETE {{baseUrl}}/books/6abdb7cfe24118902000af89
+
+### Delete the created author
+DELETE {{baseUrl}}/authors/{{createAuthor.response.body.$._id}}
+
+### Validation check: author firstName is required (expect 400)
+POST {{baseUrl}}/authors
+Content-Type: application/json
+
+{
+  "lastName": "Missing",
+  "birthDate": "2000-01-01",
+  "nationality": "Nowhere",
+  "biography": "Invalid test record",
+  "books": [],
+  "awards": []
+}
+
+### Validation check: book authorId is required (expect 400)
+POST {{baseUrl}}/books
+Content-Type: application/json
+
+{
+  "title": "Book without an author code",
+  "isbn": "978-0-00000-000-0",
+  "categoryId": "C001",
+  "publishedYear": 2025,
+  "pages": 100,
+  "summary": "Invalid test record"
+}
