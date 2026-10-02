@@ -407,47 +407,4 @@
       }
     }
   }
-}warning: in the working copy of 'swagger.json', LF will be replaced by CRLF the next time Git touches it
-[1mdiff --git a/swagger.js b/swagger.js[m
-[1mindex e93c197..576419c 100644[m
-[1m--- a/swagger.js[m
-[1m+++ b/swagger.js[m
-[36m@@ -5,7 +5,7 @@[m [mconst doc = {[m
-     title: "Library Managment API - CSE 341 - Team 01",[m
-     description: "Library Managment API - CSE 341 - Team 01",[m
-   },[m
-[31m-  host: "https://team1-finnal-project.onrender.com",[m
-[32m+[m[32m  host: "team1-finnal-project.onrender.com",[m
-   schemes: ["https"],[m
- };[m
- [m
-[1mdiff --git a/swagger.json b/swagger.json[m
-[1mindex bc8f39d..ca6f7a6 100644[m
-[1m--- a/swagger.json[m
-[1m+++ b/swagger.json[m
-[36m@@ -5,7 +5,7 @@[m
-     "description": "Library Managment API - CSE 341 - Team 01",[m
-     "version": "1.0.0"[m
-   },[m
-[31m-  "host": "https://team1-finnal-project.onrender.com",[m
-[32m+[m[32m  "host": "team1-finnal-project.onrender.com",[m
-   "basePath": "/",[m
-   "schemes": [[m
-     "https"[m
-[36m@@ -24,6 +24,16 @@[m
-         }[m
-       }[m
-     },[m
-[32m+[m[32m    "/api-docs": {[m
-[32m+[m[32m      "get": {[m
-[32m+[m[32m        "description": "",[m
-[32m+[m[32m        "responses": {[m
-[32m+[m[32m          "default": {[m
-[32m+[m[32m            "description": ""[m
-[32m+[m[32m          }[m
-[32m+[m[32m        }[m
-[32m+[m[32m      }[m
-[32m+[m[32m    },[m
-     "/books/": {[m
-       "get": {[m
-         "tags": [[m
+}
