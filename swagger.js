@@ -5,7 +5,7 @@ const doc = {
     title: "Library Managment API - CSE 341 - Team 01",
     description: "Library Managment API - CSE 341 - Team 01",
   },
-  host: "https://team1-finnal-project.onrender.com",
+  host: "team1-finnal-project.onrender.com",
   schemes: ["https"],
 };
 
