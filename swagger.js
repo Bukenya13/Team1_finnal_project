@@ -5,8 +5,8 @@ const doc = {
     title: "Library Managment API - CSE 341 - Team 01",
     description: "Library Managment API - CSE 341 - Team 01",
   },
-  host: "localhost:5000",
-  schemes: ["http"],
+  host: "https://team1-finnal-project.onrender.com",
+  schemes: ["https"],
 };
 
 const outputFile = "./swagger.json";

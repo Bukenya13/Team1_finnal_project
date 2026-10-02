@@ -5,10 +5,10 @@
     "description": "Library Managment API - CSE 341 - Team 01",
     "version": "1.0.0"
   },
-  "host": "localhost:5000",
+  "host": "https://team1-finnal-project.onrender.com",
   "basePath": "/",
   "schemes": [
-    "http"
+    "https"
   ],
   "paths": {
     "/": {
