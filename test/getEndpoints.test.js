@@ -3,7 +3,7 @@ const request = require("supertest");
 const sinon = require("sinon");
 const { ObjectId } = require("mongodb");
 
-process.env.JWT_SECRET = process.env.JWT_SECRET || "unit-test-secret";
+process.env.SESSION_SECRET = process.env.SESSION_SECRET || "unit-test-session-secret";
 
 const mongodb = require("../data/database");
 const app = require("../app");
@@ -71,6 +71,9 @@ const stubDatabase = () =>
           return docs;
         },
       }),
+      insertOne: async (doc) => ({ insertedId: new ObjectId(), ...doc }),
+      updateOne: async () => ({ modifiedCount: 1 }),
+      deleteOne: async () => ({ deletedCount: 1 }),
     }),
   });
 
@@ -170,18 +173,21 @@ describe("GET endpoint unit tests", () => {
   });
 });
 
-describe("OAuth protected endpoints", () => {
+describe("Session protected endpoints", () => {
+  let agent;
+
   beforeEach(() => {
     stubDatabase();
+    agent = request.agent(app);
   });
 
   afterEach(() => {
     sinon.restore();
   });
 
-  it("POST /books without a token returns 401", async () => {
-    const res = await request(app).post("/books").send({
-      title: "No token",
+  it("POST /books without a session returns 401", async () => {
+    const res = await agent.post("/books").send({
+      title: "No session",
       isbn: "978-0-00-000000-9",
       authorId: "A001",
       categoryId: "C001",
@@ -194,10 +200,10 @@ describe("OAuth protected endpoints", () => {
     expect(res.body.message).to.include("Unauthorized");
   });
 
-  it("POST /authors without a token returns 401", async () => {
-    const res = await request(app).post("/authors").send({
+  it("POST /authors without a session returns 401", async () => {
+    const res = await agent.post("/authors").send({
       firstName: "No",
-      lastName: "Token",
+      lastName: "Session",
       birthDate: "2000-01-01",
       nationality: "Nowhere",
       biography: "Should be rejected",
@@ -209,12 +215,11 @@ describe("OAuth protected endpoints", () => {
     expect(res.body.message).to.include("Unauthorized");
   });
 
-  it("PUT /books/:id with an invalid token returns 401", async () => {
-    const res = await request(app)
+  it("PUT /books/:id without a session returns 401", async () => {
+    const res = await agent
       .put(`/books/${bookId}`)
-      .set("Authorization", "Bearer not-a-real-token")
       .send({
-        title: "Bad token",
+        title: "No session",
         isbn: "978-0-00-000000-9",
         authorId: "A001",
         categoryId: "C001",
@@ -227,12 +232,12 @@ describe("OAuth protected endpoints", () => {
     expect(res.body.message).to.include("Unauthorized");
   });
 
-  it("PUT /authors/:id without a token returns 401", async () => {
-    const res = await request(app)
+  it("PUT /authors/:id without a session returns 401", async () => {
+    const res = await agent
       .put(`/authors/${authorId}`)
       .send({
         firstName: "No",
-        lastName: "Token",
+        lastName: "Session",
         birthDate: "2000-01-01",
         nationality: "Nowhere",
         biography: "Should be rejected",
@@ -244,10 +249,10 @@ describe("OAuth protected endpoints", () => {
     expect(res.body.message).to.include("Unauthorized");
   });
 
-  it("GET /auth/user without a token returns 401", async () => {
-    const res = await request(app).get("/auth/user");
+  it("GET /auth/user without a session returns 401", async () => {
+    const res = await agent.get("/auth/user");
 
     expect(res.status).to.equal(401);
-    expect(res.body.message).to.include("Unauthorized");
+    expect(res.body.message).to.equal("Not authenticated");
   });
 });

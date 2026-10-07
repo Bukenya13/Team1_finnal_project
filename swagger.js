@@ -8,12 +8,11 @@ const doc = {
   host: "team1-finnal-project.onrender.com",
   schemes: ["https"],
   securityDefinitions: {
-    Bearer: {
+    cookieAuth: {
       type: "apiKey",
-      name: "Authorization",
-      in: "header",
-      description:
-        "GitHub OAuth token. Paste as: Bearer <token> (get one from /auth/github)",
+      in: "cookie",
+      name: "connect.sid",
+      description: "Session cookie for GitHub OAuth authentication. Log in via /auth/github first.",
     },
   },
 };

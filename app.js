@@ -1,9 +1,24 @@
 const express = require("express");
+const session = require("express-session");
 
 const app = express();
 
 app.set("trust proxy", 1);
 app.use(express.json());
+
+// Session middleware for GitHub OAuth
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "library-management-session-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24, // 24 hours
+    },
+  })
+);
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");

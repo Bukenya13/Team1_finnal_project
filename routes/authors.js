@@ -1,7 +1,7 @@
 // add express and set the router
 const router = require("express").Router();
 
-// require the controllers and the OAuth middleware
+// require the controllers and the session auth middleware
 const authorsControllers = require("../controllers/authors");
 const { requireAuth } = require("../middleware/auth");
 
@@ -11,41 +11,13 @@ router.get("/", authorsControllers.getAll);
 // GET BY ID
 router.get("/:id", authorsControllers.getSingle);
 
-// CREATE (protected by GitHub OAuth)
+// CREATE (protected by GitHub OAuth session)
 router.post("/", requireAuth, (req, res, next) => {
-	/* #swagger.security = [{ "Bearer": [] }] */
-	/* #swagger.parameters['body'] = {
-		in: 'body',
-		required: true,
-		schema: {
-			firstName: "Gabriel",
-			lastName: "Garcia Marquez",
-			birthDate: "1927-03-06",
-			nationality: "Colombian",
-			biography: "Example biography",
-			books: ["B004"],
-			awards: ["Nobel Prize in Literature"]
-		}
-	} */
 	authorsControllers.createAuthor(req, res, next);
 });
 
-// UPDATE (protected by GitHub OAuth)
+// UPDATE (protected by GitHub OAuth session)
 router.put("/:id", requireAuth, (req, res, next) => {
-	/* #swagger.security = [{ "Bearer": [] }] */
-	/* #swagger.parameters['body'] = {
-		in: 'body',
-		required: true,
-		schema: {
-			firstName: "Gabriel",
-			lastName: "Garcia Marquez",
-			birthDate: "1927-03-06",
-			nationality: "Colombian",
-			biography: "Example biography",
-			books: ["B004"],
-			awards: ["Nobel Prize in Literature"]
-		}
-	} */
 	authorsControllers.updateAuthor(req, res, next);
 });
 

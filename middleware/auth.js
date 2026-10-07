@@ -1,30 +1,18 @@
-const jwt = require("jsonwebtoken");
-
 const requireAuth = (req, res, next) => {
-  const header = req.get("Authorization") || "";
-  const [scheme, token] = header.split(" ");
-
-  if (scheme !== "Bearer" || !token) {
+  if (!req.session || !req.session.user) {
     return res.status(401).json({
-      message:
-        "Unauthorized: send a valid token in the Authorization header as 'Bearer <token>'.",
+      message: "Unauthorized: please log in via GitHub OAuth at /auth/github",
     });
   }
-
-  if (!process.env.JWT_SECRET) {
-    return res
-      .status(500)
-      .json({ message: "Server configuration error: JWT_SECRET is not set." });
-  }
-
-  try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
-    next();
-  } catch (err) {
-    return res
-      .status(401)
-      .json({ message: "Unauthorized: invalid or expired token." });
-  }
+  req.user = req.session.user;
+  next();
 };
 
-module.exports = { requireAuth };
+const optionalAuth = (req, res, next) => {
+  if (req.session && req.session.user) {
+    req.user = req.session.user;
+  }
+  next();
+};
+
+module.exports = { requireAuth, optionalAuth };

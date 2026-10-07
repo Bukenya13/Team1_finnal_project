@@ -1,6 +1,4 @@
 const router = require("express").Router();
-const jwt = require("jsonwebtoken");
-const { requireAuth } = require("../middleware/auth");
 
 const GITHUB_AUTHORIZE_URL = "https://github.com/login/oauth/authorize";
 const GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token";
@@ -37,7 +35,7 @@ router.get("/github", (req, res, next) => {
 });
 
 // STEP 2: GitHub redirects back here with a code, we exchange it for the
-// user's GitHub profile and respond with a JWT for the protected endpoints
+// user's GitHub profile and store user in session
 router.get("/github/callback", async (req, res, next) => {
   try {
     //#swagger.tags=["Auth"]
@@ -49,10 +47,6 @@ router.get("/github/callback", async (req, res, next) => {
 
     if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET) {
       throw createError(500, "GitHub OAuth is not configured.");
-    }
-
-    if (!process.env.JWT_SECRET) {
-      throw createError(500, "JWT_SECRET is not configured.");
     }
 
     const tokenResponse = await fetch(GITHUB_TOKEN_URL, {
@@ -98,14 +92,14 @@ router.get("/github/callback", async (req, res, next) => {
       githubId: githubUser.id,
       login: githubUser.login,
       name: githubUser.name,
+      avatarUrl: githubUser.avatar_url,
     };
 
-    const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1h" });
+    // Store user in session
+    req.session.user = user;
 
     res.status(200).json({
-      message:
-        "GitHub OAuth login successful. Use this token on protected endpoints as 'Authorization: Bearer <token>'.",
-      token,
+      message: "GitHub OAuth login successful",
       user,
     });
   } catch (err) {
@@ -113,17 +107,24 @@ router.get("/github/callback", async (req, res, next) => {
   }
 });
 
-// who am I? (requires a valid token)
-router.get("/user", requireAuth, (req, res) => {
+// Get current user from session
+router.get("/user", (req, res) => {
   //#swagger.tags=["Auth"]
-  res.status(200).json({ user: req.user });
+  if (!req.session || !req.session.user) {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+  res.status(200).json({ user: req.session.user });
 });
 
-// stateless JWT: the client just discards its token
+// Logout - destroy session
 router.get("/logout", (req, res) => {
   //#swagger.tags=["Auth"]
-  res.status(200).json({
-    message: "Logged out. Discard the token stored on the client.",
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ message: "Failed to logout" });
+    }
+    res.clearCookie("connect.sid");
+    res.status(200).json({ message: "Logged out successfully" });
   });
 });
 
