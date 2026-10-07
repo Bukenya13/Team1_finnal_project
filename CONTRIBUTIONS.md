@@ -3,7 +3,7 @@
 Each team member documents two individual contributions toward this week's
 deliverables. Replace `[Name]` with your name (or GitHub username) before submitting.
 
-## Member 1 — [Name]
+## Emma
 
 1. **Categories collection** — Created the complete CRUD endpoints
    (GET, GET by id, POST, PUT, DELETE) in `controllers/categories.js` and
@@ -13,7 +13,7 @@ deliverables. Replace `[Name]` with your name (or GitHub username) before submit
    collection routes, the auth endpoints, and Bearer security definitions so
    the docs publish correctly at `/api-docs` on Render.
 
-## Member 2 — [Name]
+## Deborah
 
 1. **Members collection** — Created the complete CRUD endpoints in
    `controllers/members.js` and `routes/members.js` with validation on POST/PUT,
