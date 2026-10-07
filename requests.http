@@ -1,36 +1,44 @@
 @baseUrl = http://localhost:5000
+@token = paste_your_oauth_token_here
 
 ### Health check
 GET {{baseUrl}}/
 
-### List authors
-GET {{baseUrl}}/authors
+### =============================================================
+### AUTH (GitHub OAuth + JWT)
+### =============================================================
 
-### Create Gabriel Garcia Marquez
-# @name createAuthor
-POST {{baseUrl}}/authors
-Content-Type: application/json
+### Step 1: start the OAuth flow (opens GitHub consent screen in the browser)
+GET {{baseUrl}}/auth/github
 
-{
-  "firstName": "Gabriel",
-  "lastName": "Garcia Marquez",
-  "birthDate": "1927-03-06",
-  "nationality": "Colombian",
-  "biography": "Colombian novelist and journalist, widely known for One Hundred Years of Solitude.",
-  "books": ["B004"],
-  "awards": ["Nobel Prize in Literature 1982"]
-}
+### Step 2: GitHub redirects to /auth/github/callback, which returns a token.
+### Copy the "token" value from that response into @token above.
 
-### Get the created author
-GET {{baseUrl}}/authors/{{createAuthor.response.body.$._id}}
---------------------------------------------------------------------------------
-### List books
+### Who am I? (requires a valid token — expect 200)
+GET {{baseUrl}}/auth/user
+Authorization: Bearer {{token}}
+
+### Who am I? without a token (expect 401)
+GET {{baseUrl}}/auth/user
+
+### Logout
+GET {{baseUrl}}/auth/logout
+
+### =============================================================
+### BOOKS — POST and PUT are protected by OAuth
+### =============================================================
+
+### List books (public — expect 200)
 GET {{baseUrl}}/books
 
-### Create One Hundred Years of Solitude
+### Get one book (public — expect 200 or 404)
+GET {{baseUrl}}/books/6abdb7cfe24118902000af89
+
+### Create a book WITH token (expect 201)
 # @name createBook
 POST {{baseUrl}}/books
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "title": "One Hundred Years of Solitude",
@@ -42,26 +50,27 @@ Content-Type: application/json
   "summary": "The multi-generational story of the Buendia family in the fictional town of Macondo."
 }
 
-### Get the created book
-GET {{baseUrl}}/books/{{createBook.response.body.$._id}}
-
-### Update the created author
-PUT {{baseUrl}}/authors/{{createAuthor.response.body.$._id}}
+### Create a book WITHOUT token (expect 401)
+POST {{baseUrl}}/books
 Content-Type: application/json
 
 {
-  "firstName": "Gabriel",
-  "lastName": "Garcia Marquez",
-  "birthDate": "1927-03-06",
-  "nationality": "Colombian",
-  "biography": "Updated biography for Gabriel Garcia Marquez.",
-  "books": ["B004"],
-  "awards": ["Nobel Prize in Literature 1982"]
+  "title": "Unauthorized book",
+  "isbn": "978-0-00-000000-1",
+  "authorId": "A004",
+  "categoryId": "C001",
+  "publishedYear": 2025,
+  "pages": 100,
+  "summary": "Should be rejected"
 }
 
-### Update the created book
+### Get the created book
+GET {{baseUrl}}/books/{{createBook.response.body.$._id}}
+
+### Update the created book WITH token (expect 200)
 PUT {{baseUrl}}/books/{{createBook.response.body.$._id}}
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "title": "One Hundred Years of Solitude",
@@ -73,15 +82,193 @@ Content-Type: application/json
   "summary": "Updated summary for One Hundred Years of Solitude."
 }
 
-### Delete the created book
-DELETE {{baseUrl}}/books/6abdb7cfe24118902000af89
+### Update WITHOUT token (expect 401)
+PUT {{baseUrl}}/books/6abdb7cfe24118902000af89
+Content-Type: application/json
 
-### Delete the created author
-DELETE {{baseUrl}}/authors/{{createAuthor.response.body.$._id}}
+{
+  "title": "Unauthorized update",
+  "isbn": "978-0-00-000000-1",
+  "authorId": "A004",
+  "categoryId": "C001",
+  "publishedYear": 2025,
+  "pages": 100,
+  "summary": "Should be rejected"
+}
 
-### Validation check: author firstName is required (expect 400)
+### Delete the created book (expect 200)
+DELETE {{baseUrl}}/books/{{createBook.response.body.$._id}}
+
+### =============================================================
+### AUTHORS — POST and PUT are protected by OAuth
+### =============================================================
+
+### List authors (public — expect 200)
+GET {{baseUrl}}/authors
+
+### Get one author (public — expect 200 or 404)
+GET {{baseUrl}}/authors/6abdb7cfe24118902000af89
+
+### Create an author WITH token (expect 201)
+# @name createAuthor
 POST {{baseUrl}}/authors
 Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "firstName": "Gabriel",
+  "lastName": "Garcia Marquez",
+  "birthDate": "1927-03-06",
+  "nationality": "Colombian",
+  "biography": "Colombian novelist and journalist, widely known for One Hundred Years of Solitude.",
+  "books": ["B004"],
+  "awards": ["Nobel Prize in Literature 1982"]
+}
+
+### Create an author WITHOUT token (expect 401)
+POST {{baseUrl}}/authors
+Content-Type: application/json
+
+{
+  "firstName": "Unauthorized",
+  "lastName": "Author",
+  "birthDate": "1990-01-01",
+  "nationality": "Nowhere",
+  "biography": "Should be rejected",
+  "books": [],
+  "awards": []
+}
+
+### Get the created author
+GET {{baseUrl}}/authors/{{createAuthor.response.body.$._id}}
+
+### Update the created author WITH token (expect 200)
+PUT {{baseUrl}}/authors/{{createAuthor.response.body.$._id}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "firstName": "Gabriel",
+  "lastName": "Garcia Marquez",
+  "birthDate": "1927-03-06",
+  "nationality": "Colombian",
+  "biography": "Updated biography for Gabriel Garcia Marquez.",
+  "books": ["B004"],
+  "awards": ["Nobel Prize in Literature 1982"]
+}
+
+### Delete the created author (expect 200)
+DELETE {{baseUrl}}/authors/{{createAuthor.response.body.$._id}}
+
+### =============================================================
+### CATEGORIES — new collection (open CRUD)
+### =============================================================
+
+### List categories (expect 200)
+GET {{baseUrl}}/categories
+
+### Create a category (expect 201)
+# @name createCategory
+POST {{baseUrl}}/categories
+Content-Type: application/json
+
+{
+  "name": "Classic Fiction",
+  "description": "Timeless novels considered part of the literary canon."
+}
+
+### Get the created category
+GET {{baseUrl}}/categories/{{createCategory.response.body.$._id}}
+
+### Update the created category (expect 200)
+PUT {{baseUrl}}/categories/{{createCategory.response.body.$._id}}
+Content-Type: application/json
+
+{
+  "name": "Classic Fiction",
+  "description": "Updated description for timeless novels considered part of the literary canon."
+}
+
+### Delete the created category (expect 200)
+DELETE {{baseUrl}}/categories/{{createCategory.response.body.$._id}}
+
+### Validation check: category name is required (expect 400)
+POST {{baseUrl}}/categories
+Content-Type: application/json
+
+{
+  "description": "Missing the category name"
+}
+
+### =============================================================
+### MEMBERS — new collection (open CRUD)
+### =============================================================
+
+### List members (expect 200)
+GET {{baseUrl}}/members
+
+### Create a member (expect 201)
+# @name createMember
+POST {{baseUrl}}/members
+Content-Type: application/json
+
+{
+  "firstName": "Jordan",
+  "lastName": "Smith",
+  "email": "jordan.smith@example.com",
+  "phone": "208-555-0142",
+  "membershipType": "Student"
+}
+
+### Get the created member
+GET {{baseUrl}}/members/{{createMember.response.body.$._id}}
+
+### Update the created member (expect 200)
+PUT {{baseUrl}}/members/{{createMember.response.body.$._id}}
+Content-Type: application/json
+
+{
+  "firstName": "Jordan",
+  "lastName": "Smith",
+  "email": "jordan.smith@example.com",
+  "phone": "208-555-0199",
+  "membershipType": "Graduate Student"
+}
+
+### Delete the created member (expect 200)
+DELETE {{baseUrl}}/members/{{createMember.response.body.$._id}}
+
+### Validation check: member email is required (expect 400)
+POST {{baseUrl}}/members
+Content-Type: application/json
+
+{
+  "firstName": "No",
+  "lastName": "Email",
+  "phone": "208-555-0100",
+  "membershipType": "Faculty"
+}
+
+### Validation check: member email format is invalid (expect 400)
+POST {{baseUrl}}/members
+Content-Type: application/json
+
+{
+  "firstName": "Bad",
+  "lastName": "Email",
+  "email": "not-an-email",
+  "phone": "208-555-0100",
+  "membershipType": "Faculty"
+}
+
+### =============================================================
+### VALIDATION CHECKS on the original two collections
+### =============================================================
+
+### Validation check: author firstName is required (expect 401 without token, 400 with token)
+POST {{baseUrl}}/authors
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "lastName": "Missing",
@@ -92,9 +279,10 @@ Content-Type: application/json
   "awards": []
 }
 
-### Validation check: book authorId is required (expect 400)
+### Validation check: book authorId is required (expect 401 without token, 400 with token)
 POST {{baseUrl}}/books
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "title": "Book without an author code",
@@ -104,3 +292,12 @@ Content-Type: application/json
   "pages": 100,
   "summary": "Invalid test record"
 }
+
+### Validation check: invalid book ID on GET (expect 400)
+GET {{baseUrl}}/books/not-a-valid-id
+
+### Validation check: invalid category ID on GET (expect 400)
+GET {{baseUrl}}/categories/not-a-valid-id
+
+### Validation check: invalid member ID on GET (expect 400)
+GET {{baseUrl}}/members/not-a-valid-id

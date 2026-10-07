@@ -1,8 +1,9 @@
 // add express and set the router
 const router = require("express").Router();
 
-// require the controllers
+// require the controllers and the OAuth middleware
 const booksControllers = require("../controllers/books");
+const { requireAuth } = require("../middleware/auth");
 
 // GET ALL
 router.get("/", booksControllers.getAll);
@@ -10,8 +11,9 @@ router.get("/", booksControllers.getAll);
 // GET BY ID
 router.get("/:id", booksControllers.getSingle);
 
-// CREATE
-router.post("/", (req, res, next) => {
+// CREATE (protected by GitHub OAuth)
+router.post("/", requireAuth, (req, res, next) => {
+	/* #swagger.security = [{ "Bearer": [] }] */
 	/* #swagger.parameters['body'] = {
 		in: 'body',
 		required: true,
@@ -28,8 +30,9 @@ router.post("/", (req, res, next) => {
 	booksControllers.createBook(req, res, next);
 });
 
-// UPDATE
-router.put("/:id", (req, res, next) => {
+// UPDATE (protected by GitHub OAuth)
+router.put("/:id", requireAuth, (req, res, next) => {
+	/* #swagger.security = [{ "Bearer": [] }] */
 	/* #swagger.parameters['body'] = {
 		in: 'body',
 		required: true,

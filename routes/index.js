@@ -12,4 +12,10 @@ router.use("/books", require("./books"));
 
 router.use("/authors", require("./authors"));
 
+router.use("/categories", require("./categories"));
+
+router.use("/members", require("./members"));
+
+router.use("/auth", require("./auth"));
+
 module.exports = router;
